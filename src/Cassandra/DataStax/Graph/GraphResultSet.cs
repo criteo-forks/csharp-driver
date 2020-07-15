@@ -100,7 +100,7 @@ namespace Cassandra.DataStax.Graph
 
         private static GraphNode GetGraphSON2Node(Row row)
         {
-            return new GraphNode(new GraphSON2Node(row.GetValue<string>("gremlin")));
+            return new GraphNode(new GraphSONNode(row.GetValue<string>("gremlin")));
         }
 
         IEnumerator IEnumerable.GetEnumerator()

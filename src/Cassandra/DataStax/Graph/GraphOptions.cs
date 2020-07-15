@@ -81,7 +81,7 @@ namespace Cassandra.DataStax.Graph
             };
 
         /// <summary>
-        /// Gets the graph language to use in graph queries.
+        /// Gets the graph language to use in graph queries. The default is <see cref="DefaultLanguage"/>.
         /// </summary>
         public string Language
         {
@@ -134,6 +134,25 @@ namespace Cassandra.DataStax.Graph
         }
 
         /// <summary>
+        /// If not explicitly specified, the following rules apply:
+        /// <list type=""></list>
+        /// <list type="bullet">
+        /// <item>
+        /// <description>Default to <see cref="Cassandra.GraphProtocolVersion.GraphSON1"/>.</description>
+        /// </item>
+        /// <item>
+        /// <description>If <see cref="Language"/> is not gremlin-groovy,
+        /// set <see cref="Cassandra.GraphProtocolVersion.GraphSON2"/>.</description>
+        /// </item>
+        /// <item>
+        /// <description>If <see cref="Name"/> is specified and is a Core graph,
+        /// set <see cref="Cassandra.GraphProtocolVersion.GraphSON3"/>.</description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public GraphProtocolVersion? GraphProtocolVersion { get; private set; }
+
+        /// <summary>
         /// Gets the consistency level used for read queries
         /// </summary>
         public ConsistencyLevel? WriteConsistencyLevel
@@ -182,6 +201,13 @@ namespace Cassandra.DataStax.Graph
         public GraphOptions SetName(string name)
         {
             _name = name;
+            RebuildDefaultPayload();
+            return this;
+        }
+
+        public GraphOptions SetGraphProtocolVersion(GraphProtocolVersion version)
+        {
+            GraphProtocolVersion = version;
             RebuildDefaultPayload();
             return this;
         }

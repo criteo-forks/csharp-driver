@@ -43,6 +43,9 @@ namespace Cassandra.Mapping.TypeConversion
 
         private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
         private const BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
+        
+        private static readonly MethodInfo CastMethod = typeof (TypeConverter).GetTypeInfo()
+            .GetMethod(nameof(Cast), PrivateStatic);
 
         private static readonly MethodInfo FindFromDbConverterMethod = typeof (TypeConverter).GetTypeInfo()
             .GetMethod(nameof(FindFromDbConverter), PrivateInstance);
@@ -199,7 +202,12 @@ namespace Cassandra.Mapping.TypeConversion
 
             return (Func<TSource, TResult>) converter;
         }
-
+        
+        internal dynamic DynamicCast(object obj, Type to)
+        {
+            var castMethod = TypeConverter.CastMethod.MakeGenericMethod(to);
+            return castMethod.Invoke(obj, new[] { obj });
+        }
 
         /// <summary>
         /// Gets a Function that can convert a source type value on a POCO to a destination type value for storage in C*.
@@ -679,6 +687,11 @@ namespace Cassandra.Mapping.TypeConversion
             }
 
             return listFromDatabase.Select(TryGetFromDbConverter<TSource, TResult>()).ToArray();
+        }
+        
+        private static T Cast<T>(object entity) where T : class
+        {
+            return entity as T;
         }
 
         /// <summary>

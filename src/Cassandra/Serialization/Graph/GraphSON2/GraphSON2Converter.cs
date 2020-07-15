@@ -154,7 +154,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
 
         protected override GraphNode ToGraphNode(JToken token)
         {
-            return token == null ? null : new GraphNode(new GraphSON2Node(token));
+            return token == null ? null : new GraphNode(new GraphSONNode(token));
         }
 
         private static ReadDelegate GetParserReader<T>(Func<string, T> parser, bool allowNulls = false)

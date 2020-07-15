@@ -38,6 +38,11 @@ namespace Cassandra.DataStax.Graph
         /// Gets the graph name to use with this statement.
         /// </summary>
         string GraphName { get; }
+        
+        /// <summary>
+        /// Gets the graph protocol version to use with this statement.
+        /// </summary>
+        GraphProtocolVersion GraphProtocolVersion { get; }
 
         /// <summary>
         /// Gets the consistency level used for read graph queries.
@@ -107,6 +112,12 @@ namespace Cassandra.DataStax.Graph
         /// If you don't call this method, it is left unset.
         /// </summary>
         IGraphStatement SetGraphName(string name);
+
+        /// <summary>
+        /// Sets the graph protocol version to use in graph queries.
+        /// If you don't call this method, the default will be used (check <see cref="GraphOptions.GraphProtocolVersion"/>).
+        /// </summary>
+        IGraphStatement SetGraphProtocolVersion(GraphProtocolVersion graphProtocolVersion);
 
         /// <summary>
         /// Sets the consistency level used for the graph read query.
