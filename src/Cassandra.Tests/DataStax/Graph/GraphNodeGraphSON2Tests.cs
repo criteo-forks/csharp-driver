@@ -34,7 +34,7 @@ namespace Cassandra.Tests.DataStax.Graph
         [TestCase("\"something\"", "something")]
         [TestCase("true", true)]
         [TestCase("false", false)]
-        [TestCase("{\"@type\": \"g:Int16\", \"@value\": 12}", (short)12)]
+        [TestCase("{\"@type\": \"gx:Int16\", \"@value\": 12}", (short)12)]
         [TestCase("{\"@type\": \"g:Int32\", \"@value\": 123}", 123)]
         [TestCase("{\"@type\": \"g:Int64\", \"@value\": 456}", 456L)]
         [TestCase("{\"@type\": \"g:Float\", \"@value\": 123.1}", 123.1f)]
@@ -50,23 +50,16 @@ namespace Cassandra.Tests.DataStax.Graph
         public void Implicit_Conversion_Operators_Test()
         {
             var intNode = GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Int16\", \"@value\": 123}");
-            Assert.Throws<InvalidTypeException>(
-                () => { var _ = (int) intNode; }, 
-                "Cassandra.InvalidTypeException : It is not possible to convert type System.Int16 to target type System.Int32");
-            Assert.Throws<InvalidTypeException>(
-                () => { var _ = (long) intNode; }, 
-                "Cassandra.InvalidTypeException : It is not possible to convert type System.Int16 to target type System.Int64");
-            Assert.AreEqual((short)123, (short) intNode);
+            Assert.AreEqual(123, (int)intNode);
+            Assert.AreEqual(123L, (long)intNode);
+            Assert.AreEqual((short)123, (short)intNode);
             string stringValue = GraphNodeGraphSON2Tests.GetGraphNode("\"something\"");
             Assert.AreEqual("something", stringValue);
             bool boolValue = GraphNodeGraphSON2Tests.GetGraphNode("true");
             Assert.True(boolValue);
             var floatNode = GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Float\", \"@value\": 123.1}");
             Assert.AreEqual(123.1f, (float) floatNode);
-            Assert.Throws<InvalidTypeException>(
-                () => { var _ = (double) floatNode; }, 
-                "Cassandra.InvalidTypeException : It is not possible to convert type System.Single to target type System.Double");
-        }
+            Assert.AreEqual((double)123.1f, (double) floatNode);        }
 
         [Test]
         public void To_Should_Throw_For_Structs_With_Null()
@@ -102,7 +95,7 @@ namespace Cassandra.Tests.DataStax.Graph
         [Test]
         public void To_Should_Parse_Nullable_Values()
         {
-            var nodes = new[] { GraphNodeGraphSON2Tests.GetGraphNode("null"), GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gz:Obj\", \"@value\": null}") };
+            var nodes = new[] { GraphNodeGraphSON2Tests.GetGraphNode("null"), GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Vertex\", \"@value\": null}") };
             foreach (var node in nodes)
             {
                 Assert.Null(node.To<short?>());
@@ -117,22 +110,22 @@ namespace Cassandra.Tests.DataStax.Graph
                 Assert.Null(node.To<Duration?>());
                 Assert.Null(node.To<DateTimeOffset?>());
             }
-            Assert.AreEqual(1, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Int16\", \"@value\": 1}").To<short?>());
+            Assert.AreEqual(1, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Int16\", \"@value\": 1}").To<short?>());
             Assert.AreEqual(1, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Int32\", \"@value\": 1}").To<int?>());
             Assert.AreEqual(1L, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Int64\", \"@value\": 1}").To<long?>());
-            Assert.AreEqual(1M, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:BigDecimal\", \"@value\": 1}").To<decimal?>());
+            Assert.AreEqual(1M, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:BigDecimal\", \"@value\": 1}").To<decimal?>());
             Assert.AreEqual(1F, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Float\", \"@value\": 1}").To<float?>());
             Assert.AreEqual(1D, GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Double\", \"@value\": 1}").To<double?>());
-            Assert.AreEqual(Guid.Parse("2cc83ef0-5da4-11e7-8c51-2578d2fa5d3a"), GraphNodeGraphSON2Tests.GetGraphNode(
-                "{\"@type\": \"g:Int16\", \"@value\": \"2cc83ef0-5da4-11e7-8c51-2578d2fa5d3a\"}").To<Guid?>());
+            Assert.AreEqual(null, GraphNodeGraphSON2Tests.GetGraphNode(
+                "{\"@type\": \"gx:Int16\", \"@value\": null}").To<Guid?>());
             Assert.AreEqual((TimeUuid) Guid.Parse("2cc83ef0-5da4-11e7-8c51-2578d2fa5d3a"), GraphNodeGraphSON2Tests.GetGraphNode(
                 "{\"@type\": \"g:UUID\", \"@value\": \"2cc83ef0-5da4-11e7-8c51-2578d2fa5d3a\"}").To<TimeUuid?>());
             Assert.AreEqual(BigInteger.Parse("1"), 
-                            GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Int16\", \"@value\": 1}").To<BigInteger?>());
+                            GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Int16\", \"@value\": 1}").To<BigInteger?>());
             Assert.AreEqual(Duration.Parse("12h"), 
                             GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Duration\", \"@value\": \"12h\"}").To<Duration?>());
             Assert.AreEqual(DateTimeOffset.Parse("1970-01-01 00:00:01Z"), 
-                GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Instant\", \"@value\": 1000}").To<DateTimeOffset?>());
+                GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Timestamp\", \"@value\": 1000}").To<DateTimeOffset?>());
         }
 
         [TestCase("\"something\"", "something")]
@@ -287,6 +280,24 @@ namespace Cassandra.Tests.DataStax.Graph
             {
                 Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<DateTimeOffset>());
                 Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<DateTimeOffset?>());
+            }
+        }
+        
+        [TestCase("{\"@type\": \"gx:Instant\", \"@value\": \"2016-12-14T16:39:19.349Z\"}", 
+            "2016-12-14T16:39:19.349Z")]
+        [TestCase("null", null)]
+        public void To_Should_Parse_Instant_Values(string json, string stringValue)
+        {
+            var node = GraphNodeGraphSON2Tests.GetGraphNode(json);
+            if (stringValue == null)
+            {
+                Assert.AreEqual(null, node.To<Instant?>());
+            }
+            else
+            {
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<Instant>());
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<Instant?>());
+                Assert.AreEqual(new Instant(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture)), node.To<Instant>());
             }
         }
 

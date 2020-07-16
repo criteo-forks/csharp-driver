@@ -20,8 +20,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Reflection;
 using Cassandra.Collections;
+using Cassandra.DataStax.Graph;
 
 namespace Cassandra.Mapping.TypeConversion
 {
@@ -44,9 +46,6 @@ namespace Cassandra.Mapping.TypeConversion
         private const BindingFlags PrivateStatic = BindingFlags.NonPublic | BindingFlags.Static;
         private const BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
         
-        private static readonly MethodInfo CastMethod = typeof (TypeConverter).GetTypeInfo()
-            .GetMethod(nameof(Cast), PrivateStatic);
-
         private static readonly MethodInfo FindFromDbConverterMethod = typeof (TypeConverter).GetTypeInfo()
             .GetMethod(nameof(FindFromDbConverter), PrivateInstance);
 
@@ -203,12 +202,6 @@ namespace Cassandra.Mapping.TypeConversion
             return (Func<TSource, TResult>) converter;
         }
         
-        internal dynamic DynamicCast(object obj, Type to)
-        {
-            var castMethod = TypeConverter.CastMethod.MakeGenericMethod(to);
-            return castMethod.Invoke(obj, new[] { obj });
-        }
-
         /// <summary>
         /// Gets a Function that can convert a source type value on a POCO to a destination type value for storage in C*.
         /// </summary>
@@ -324,8 +317,54 @@ namespace Cassandra.Mapping.TypeConversion
                     }
                 }
             }
-            
+
+            //if (TryGetGraphConverter(dbType, pocoType, out converter))
+            //{
+            //    return converter;
+            //}
+
             return null;
+        }
+
+        private bool TryGetGraphConverter(Type dbType, Type pocoType, out Delegate converter)
+        {
+            if (dbType == typeof(Instant))
+            {
+                if (pocoType == typeof(DateTime))
+                {
+                    Func<Instant, DateTime> dateMapper = d => d.AsDateTime();
+                    converter = dateMapper;
+                    return true;
+                }
+                if (pocoType == typeof(DateTime?))
+                {
+                    Func<Instant, DateTime?> dateMapper = d => d.AsDateTime();
+                    converter = dateMapper;
+                    return true;
+                }
+                if (pocoType == typeof(DateTimeOffset))
+                {
+                    Func<Instant, DateTimeOffset> dateMapper = d => d.AsDateTimeOffset();
+                    converter = dateMapper;
+                    return true;
+                }
+                if (pocoType == typeof(DateTimeOffset?))
+                {
+                    Func<Instant, DateTimeOffset?> dateMapper = d => d.AsDateTimeOffset();
+                    converter = dateMapper;
+                    return true;
+                }
+            }
+
+            if (pocoType == typeof(BigInteger))
+            {
+                if (dbType == typeof(int))
+                {
+                }
+            }
+
+            converter = null;
+            return false;
         }
 
         private Delegate ConvertFromIDictionary(Type targetGenericType, Type[] sourceGenericArgs,
@@ -687,11 +726,6 @@ namespace Cassandra.Mapping.TypeConversion
             }
 
             return listFromDatabase.Select(TryGetFromDbConverter<TSource, TResult>()).ToArray();
-        }
-        
-        private static T Cast<T>(object entity)
-        {
-            return (T)entity;
         }
 
         /// <summary>

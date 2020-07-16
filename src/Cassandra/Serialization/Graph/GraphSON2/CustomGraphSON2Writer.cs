@@ -30,17 +30,15 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         private static readonly IDictionary<Type, IGraphSONSerializer> CustomGraphSON2SpecificSerializers =
             new Dictionary<Type, IGraphSONSerializer>
             {
-                { typeof(DateTime), new InstantSerializer() },
-                { typeof(DateTimeOffset), new InstantSerializer() },
+                { typeof(DateTime), new DateSerializer() },
+                { typeof(Instant), new InstantSerializer() },
                 { typeof(LocalTime), new LocalTimeSerializer() },
                 { typeof(LocalDate), new LocalDateSerializer() },
                 { typeof(IPAddress), new InetAddressSerializer() },
-
                 { typeof(byte[]), new BlobSerializer() },
                 { typeof(LineString), new LineStringSerializer() },
                 { typeof(Point), new PointSerializer() },
                 { typeof(Polygon), new PolygonSerializer() },
-
                 { typeof(IProperty), new PropertySerializer() },
                 { typeof(IPropertyWithElement), new PropertySerializer() },
                 { typeof(Property), new PropertySerializer() },
@@ -51,7 +49,6 @@ namespace Cassandra.Serialization.Graph.GraphSON2
                 { typeof(IEdge), new EdgeSerializer() },
                 { typeof(Edge), new EdgeSerializer() },
                 { typeof(EnumWrapper), new EnumSerializer()},
-
                 { typeof(GraphNode), new GraphNodeSerializer() },
                 { typeof(IGraphNode), new GraphNodeSerializer() },
             };

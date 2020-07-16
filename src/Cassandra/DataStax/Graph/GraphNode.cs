@@ -229,7 +229,15 @@ namespace Cassandra.DataStax.Graph
         /// <exception cref="NotSupportedException">
         /// Throws NotSupportedException when the target type is not supported
         /// </exception>
-        public T To<T>() => (T)To(typeof(T));
+        public T To<T>()
+        {
+            var type = typeof(T);
+            if (type == typeof(object) || type == typeof(GraphNode) || type == typeof(IGraphNode))
+            {
+                return (T)(object)this;
+            }
+            return _node.To<T>();
+        }
 
         /// <summary>
         /// Returns the representation of the <see cref="GraphNode"/> as an instance of the type provided.

@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using Cassandra.DataStax.Graph;
@@ -83,7 +84,9 @@ namespace Cassandra.Serialization.Graph
             //     (TFieldOrProp) row.GetValue<T>(columnIndex);
             try
             {
-                return _typeConverter.DynamicCast(result, type);
+                var expr = (ConstantExpression) Expression.Constant(result);
+                var convert = Expression.Convert(expr, type);
+                return Expression.Lambda(convert).Compile().DynamicInvoke();
             }
             catch (Exception ex)
             {
@@ -92,7 +95,7 @@ namespace Cassandra.Serialization.Graph
             }
         }
 
-        private bool TryConvert(JToken token, Type type, out object result)
+        private bool TryConvert(JToken token, Type type, out dynamic result)
         {
             if (type == typeof(object) || type == typeof(GraphNode) || type == typeof(IGraphNode))
             {
@@ -143,7 +146,7 @@ namespace Cassandra.Serialization.Graph
             return ConvertFromDb(_reader.ToObject(token), type, out result);
         }
 
-        private bool ConvertFromDb(object obj, Type targetType, out object result)
+        private bool ConvertFromDb(object obj, Type targetType, out dynamic result)
         {
             if (obj == null)
             {

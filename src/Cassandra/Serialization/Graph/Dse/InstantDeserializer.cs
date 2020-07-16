@@ -15,7 +15,7 @@
 
 using System;
 using System.Globalization;
-
+using Cassandra.DataStax.Graph;
 using Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON;
 
 namespace Cassandra.Serialization.Graph.Dse
@@ -35,21 +35,13 @@ namespace Cassandra.Serialization.Graph.Dse
 
         protected override string ToString(dynamic obj)
         {
-            if (obj is DateTime)
-            {
-                DateTime p = obj;
-                return p.ToString(InstantSerializer.FormatString, CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                DateTimeOffset p = obj;
-                return p.ToString(InstantSerializer.FormatString, CultureInfo.InvariantCulture);
-            }
+            Instant instant = obj;
+            return instant.Value.ToString(InstantSerializer.FormatString, CultureInfo.InvariantCulture);
         }
 
         protected override dynamic FromString(string str)
         {
-            return DateTimeOffset.Parse(str, CultureInfo.InvariantCulture);
+            return new Instant(DateTimeOffset.Parse(str, CultureInfo.InvariantCulture));
         }
     }
 }

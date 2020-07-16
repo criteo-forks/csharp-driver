@@ -269,6 +269,17 @@ namespace Cassandra.Serialization.Graph.GraphSON1
                 .Properties()
                 .ToDictionary(prop => prop.Name, prop => new GraphNode(new GraphSON1Node(prop.Value)) as T);
         }
+        
+        /// <summary>
+        /// Returns the representation of the <see cref="GraphNode"/> as an instance of the type provided.
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// Throws NotSupportedException when the target type is not supported
+        /// </exception>
+        public T To<T>()
+        {
+            return (T)GetTokenValue(_token, typeof(T));
+        }
 
         /// <summary>
         /// Returns the representation of the <see cref="GraphNode"/> as an instance of the type provided.

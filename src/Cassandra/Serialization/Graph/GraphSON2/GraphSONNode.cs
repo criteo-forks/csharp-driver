@@ -142,7 +142,18 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         /// </summary>
         private T GetTokenValue<T>(JToken token)
         {
-            return (T)GetTokenValue(token, typeof(T));
+            try
+            {
+                return _graphSONConverter.FromDb<T>(token);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new NotSupportedException($"Type {typeof(T)} is not supported", ex);
+            }
+            catch (JsonReaderException ex)
+            {
+                throw new InvalidOperationException($"Could not convert to {typeof(T)}: {token}", ex);
+            }
         }
 
         private object GetTokenValue(JToken token, Type type)
@@ -237,6 +248,17 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         public object To(Type type)
         {
             return GetTokenValue(_token, type);
+        }
+        
+        /// <summary>
+        /// Returns the representation of the <see cref="GraphNode"/> as an instance of the type provided.
+        /// </summary>
+        /// <exception cref="NotSupportedException">
+        /// Throws NotSupportedException when the target type is not supported
+        /// </exception>
+        public T To<T>()
+        {
+            return GetTokenValue<T>(_token);
         }
 
         /// <summary>

@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cassandra.DataStax.Graph;
 using Cassandra.Serialization.Graph.Dse;
 using Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON;
@@ -33,18 +34,15 @@ namespace Cassandra.Serialization.Graph.GraphSON2
                 { LocalTimeSerializer.TypeName, new LocalTimeSerializer() },
                 { LocalDateSerializer.TypeName, new LocalDateSerializer() },
                 { InetAddressSerializer.TypeName, new InetAddressSerializer() },
-
                 { BlobSerializer.TypeName, new BlobSerializer() },
                 { LineStringSerializer.TypeName, new LineStringSerializer() },
                 { PointSerializer.TypeName, new PointSerializer() },
                 { PolygonSerializer.TypeName, new PolygonSerializer() },
-
                 { VertexDeserializer.TypeName, new VertexDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
                 { VertexPropertyDeserializer.TypeName, new VertexPropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
                 { EdgeDeserializer.TypeName, new EdgeDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
                 { PathDeserializer.TypeName, new PathDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
                 { PropertyDeserializer.TypeName, new PropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-
                 { TraverserDeserializer.TypeName, new TraverserDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
             };
 
@@ -62,6 +60,74 @@ namespace Cassandra.Serialization.Graph.GraphSON2
             {
                 Deserializers[kv.Key] = kv.Value;
             }
+        }
+        
+        /// <summary>
+        ///     Deserializes GraphSON to an object.
+        /// </summary>
+        /// <param name="jToken">The GraphSON to deserialize.</param>
+        /// <returns>The deserialized object.</returns>
+        public override dynamic ToObject(JToken jToken)
+        {
+            if (IsNullOrUndefined(jToken))
+            {
+                return null;
+            }
+
+            if (jToken is JArray)
+            {
+                return jToken.Select(t => ToObject(t));
+            }
+            if (jToken is JValue jValue)
+            {
+                return jValue.Value;
+            }
+            if (!HasTypeKey(jToken))
+            {
+                return ReadDictionary(jToken);
+            }
+            return ReadTypedValue(jToken);
+        }
+
+        private bool HasTypeKey(JToken jToken)
+        {
+            var graphSONType = (string)jToken[GraphSONTokens.TypeKey];
+            return graphSONType != null;
+        }
+
+        private dynamic ReadTypedValue(JToken typedValue)
+        {
+            var graphSONType = (string)typedValue[GraphSONTokens.TypeKey];
+            if (!Deserializers.TryGetValue(graphSONType, out var deserializer))
+            {
+                throw new InvalidOperationException($"Deserializer for \"{graphSONType}\" not found");
+            }
+
+            var value = typedValue[GraphSONTokens.ValueKey];
+            if (IsNullOrUndefined(value))
+            {
+                return null;
+            }
+
+            return deserializer.Objectify(typedValue[GraphSONTokens.ValueKey], this);
+        }
+
+        private dynamic ReadDictionary(JToken jtokenDict)
+        {
+            var dict = new Dictionary<string, dynamic>();
+            foreach (var e in jtokenDict)
+            {
+                var property = e as JProperty;
+                if (property == null)
+                    throw new InvalidOperationException($"Cannot read graphson: {jtokenDict}");
+                dict.Add(property.Name, ToObject(property.Value));
+            }
+            return dict;
+        }
+
+        private bool IsNullOrUndefined(JToken jToken)
+        {
+            return jToken.Type == JTokenType.Null || jToken.Type == JTokenType.Undefined;
         }
     }
 }
