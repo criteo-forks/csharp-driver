@@ -318,53 +318,7 @@ namespace Cassandra.Mapping.TypeConversion
                 }
             }
 
-            //if (TryGetGraphConverter(dbType, pocoType, out converter))
-            //{
-            //    return converter;
-            //}
-
             return null;
-        }
-
-        private bool TryGetGraphConverter(Type dbType, Type pocoType, out Delegate converter)
-        {
-            if (dbType == typeof(Instant))
-            {
-                if (pocoType == typeof(DateTime))
-                {
-                    Func<Instant, DateTime> dateMapper = d => d.AsDateTime();
-                    converter = dateMapper;
-                    return true;
-                }
-                if (pocoType == typeof(DateTime?))
-                {
-                    Func<Instant, DateTime?> dateMapper = d => d.AsDateTime();
-                    converter = dateMapper;
-                    return true;
-                }
-                if (pocoType == typeof(DateTimeOffset))
-                {
-                    Func<Instant, DateTimeOffset> dateMapper = d => d.AsDateTimeOffset();
-                    converter = dateMapper;
-                    return true;
-                }
-                if (pocoType == typeof(DateTimeOffset?))
-                {
-                    Func<Instant, DateTimeOffset?> dateMapper = d => d.AsDateTimeOffset();
-                    converter = dateMapper;
-                    return true;
-                }
-            }
-
-            if (pocoType == typeof(BigInteger))
-            {
-                if (dbType == typeof(int))
-                {
-                }
-            }
-
-            converter = null;
-            return false;
         }
 
         private Delegate ConvertFromIDictionary(Type targetGenericType, Type[] sourceGenericArgs,
