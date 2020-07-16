@@ -19,17 +19,13 @@ using System;
 namespace Cassandra.DataStax.Graph
 {
     /// <summary>
-    /// Represents a vertex property in DSE Graph.
-    /// <para>
-    /// Vertex properties are special because they are also elements, and thus have an identifier; they can also
-    /// contain properties of their own (usually referred to as "meta properties").
-    /// </para>
+    /// Represents a property with element in DSE Graph. Element will always be null when GraphSON2 is NOT used.
     /// </summary>
-    public interface IVertexProperty : IProperty, IElement, IEquatable<IVertexProperty>
+    public interface IPropertyWithElement : IProperty, IEquatable<IPropertyWithElement>
     {
         /// <summary>
-        ///     The <see cref="IVertex" /> that owns this <see cref="IVertexProperty" />.
+        /// Gets the property element.
         /// </summary>
-        IGraphNode Vertex { get; }
+        IGraphNode Element { get; }
     }
 }

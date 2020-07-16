@@ -689,9 +689,9 @@ namespace Cassandra.Mapping.TypeConversion
             return listFromDatabase.Select(TryGetFromDbConverter<TSource, TResult>()).ToArray();
         }
         
-        private static T Cast<T>(object entity) where T : class
+        private static T Cast<T>(object entity)
         {
-            return entity as T;
+            return (T)entity;
         }
 
         /// <summary>

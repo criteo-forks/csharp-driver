@@ -49,7 +49,7 @@ namespace Cassandra.Serialization.Graph.Dse
 
         protected override dynamic FromString(string str)
         {
-            return DateTimeOffset.Parse(str);
+            return DateTimeOffset.Parse(str, CultureInfo.InvariantCulture);
         }
     }
 }

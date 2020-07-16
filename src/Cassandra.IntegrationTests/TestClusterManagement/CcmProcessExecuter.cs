@@ -59,64 +59,64 @@ namespace Cassandra.IntegrationTests.TestClusterManagement
         public static ProcessOutput ExecuteProcess(string processName, string args, int timeout, IReadOnlyDictionary<string, string> envVariables = null, string workDir = null)
         {
             var output = new ProcessOutput();
-            //using (var process = new Process())
-            //{
-            //    process.StartInfo.FileName = processName;
-            //    process.StartInfo.Arguments = args;
-            //    process.StartInfo.RedirectStandardOutput = true;
-            //    process.StartInfo.RedirectStandardError = true;
-            //    //Hide the python window if possible
-            //    process.StartInfo.UseShellExecute = false;
-            //    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            //    process.StartInfo.CreateNoWindow = true;
+            using (var process = new Process())
+            {
+                process.StartInfo.FileName = processName;
+                process.StartInfo.Arguments = args;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                //Hide the python window if possible
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.CreateNoWindow = true;
 
-            //    if (envVariables != null)
-            //    {
-            //        foreach (var envVar in envVariables)
-            //        {
-            //            process.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
-            //        }
-            //    }
+                if (envVariables != null)
+                {
+                    foreach (var envVar in envVariables)
+                    {
+                        process.StartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
+                    }
+                }
 
-            //    if (workDir != null)
-            //    {
-            //        process.StartInfo.WorkingDirectory = workDir;
-            //    }
-                
-            //    process.Start();
+                if (workDir != null)
+                {
+                    process.StartInfo.WorkingDirectory = workDir;
+                }
 
-            //    var processEndTokenSource = new CancellationTokenSource();
-            //    var timeoutTokenSource = new CancellationTokenSource();
+                process.Start();
 
-            //    var tStandardOutput = CcmProcessExecuter.ReadStreamAsync(
-            //        process.StandardOutput, processEndTokenSource.Token, timeoutTokenSource.Token);
-            //    var tStandardError = CcmProcessExecuter.ReadStreamAsync(
-            //        process.StandardError, processEndTokenSource.Token, timeoutTokenSource.Token);
+                var processEndTokenSource = new CancellationTokenSource();
+                var timeoutTokenSource = new CancellationTokenSource();
 
-            //    if (process.WaitForExit(timeout))
-            //    {
-            //        // Process completed.
-            //        output.ExitCode = process.ExitCode;
-            //        processEndTokenSource.Cancel();
+                var tStandardOutput = CcmProcessExecuter.ReadStreamAsync(
+                    process.StandardOutput, processEndTokenSource.Token, timeoutTokenSource.Token);
+                var tStandardError = CcmProcessExecuter.ReadStreamAsync(
+                    process.StandardError, processEndTokenSource.Token, timeoutTokenSource.Token);
 
-            //        // process terminated normally, give some time for streams to catch up
-            //        // (note that usually this will happen instantly and this 5 second timeout won't be necessary)
-            //        timeoutTokenSource.CancelAfter(5000);
-            //    }
-            //    else
-            //    {
-            //        // Timed out.
-            //        output.ExitCode = -1;
-            //        processEndTokenSource.Cancel();
-            //        timeoutTokenSource.Cancel();
-            //    }
-            //    var stdOut = tStandardOutput.GetAwaiter().GetResult();
-            //    var stdErr = tStandardError.GetAwaiter().GetResult();
+                if (process.WaitForExit(timeout))
+                {
+                    // Process completed.
+                    output.ExitCode = process.ExitCode;
+                    processEndTokenSource.Cancel();
 
-            //    output.SetOutput(stdOut + Environment.NewLine + 
-            //                     "STDERR:" + Environment.NewLine + 
-            //                     stdErr);
-            //}
+                    // process terminated normally, give some time for streams to catch up
+                    // (note that usually this will happen instantly and this 5 second timeout won't be necessary)
+                    timeoutTokenSource.CancelAfter(5000);
+                }
+                else
+                {
+                    // Timed out.
+                    output.ExitCode = -1;
+                    processEndTokenSource.Cancel();
+                    timeoutTokenSource.Cancel();
+                }
+                var stdOut = tStandardOutput.GetAwaiter().GetResult();
+                var stdErr = tStandardError.GetAwaiter().GetResult();
+
+                output.SetOutput(stdOut + Environment.NewLine +
+                                 "STDERR:" + Environment.NewLine +
+                                 stdErr);
+            }
             return output;
         }
 

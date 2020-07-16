@@ -42,7 +42,7 @@ namespace Cassandra.DataStax.Graph
         /// <summary>
         /// Gets the graph protocol version to use with this statement.
         /// </summary>
-        GraphProtocolVersion GraphProtocolVersion { get; }
+        GraphProtocol? GraphProtocolVersion { get; }
 
         /// <summary>
         /// Gets the consistency level used for read graph queries.
@@ -91,8 +91,8 @@ namespace Cassandra.DataStax.Graph
         /// settable consistency level. Setting only this property will indicate to the server to use this consistency
         /// level for both reads and writes in Cassandra. Read or write consistency level can be set separately with
         /// respectively
-        /// <see cref="SetGraphReadConsistencyLevel(ConsistencyLevel)"/> and
-        /// <see cref="SetGraphWriteConsistencyLevel(ConsistencyLevel)"/> will override the consistency set
+        /// <see cref="SetGraphReadConsistencyLevel(Cassandra.ConsistencyLevel)"/> and
+        /// <see cref="SetGraphWriteConsistencyLevel(Cassandra.ConsistencyLevel)"/> will override the consistency set
         /// here.
         /// </para>
         /// </summary>
@@ -117,13 +117,13 @@ namespace Cassandra.DataStax.Graph
         /// Sets the graph protocol version to use in graph queries.
         /// If you don't call this method, the default will be used (check <see cref="GraphOptions.GraphProtocolVersion"/>).
         /// </summary>
-        IGraphStatement SetGraphProtocolVersion(GraphProtocolVersion graphProtocolVersion);
+        IGraphStatement SetGraphProtocolVersion(GraphProtocol graphProtocol);
 
         /// <summary>
         /// Sets the consistency level used for the graph read query.
         /// <para>
         /// This setting will override the consistency level set with 
-        /// <see cref="SetConsistencyLevel(ConsistencyLevel)"/> only for the READ part of the graph query.
+        /// <see cref="SetConsistencyLevel(Cassandra.ConsistencyLevel)"/> only for the READ part of the graph query.
         /// </para>
         /// </summary>
         IGraphStatement SetGraphReadConsistencyLevel(ConsistencyLevel consistency);
@@ -143,7 +143,7 @@ namespace Cassandra.DataStax.Graph
         /// Sets the consistency level used for the graph write query.
         /// <para>
         /// This setting will override the consistency level set with 
-        /// <see cref="SetConsistencyLevel(ConsistencyLevel)"/> only for the WRITE part of the graph query.
+        /// <see cref="SetConsistencyLevel(Cassandra.ConsistencyLevel)"/> only for the WRITE part of the graph query.
         /// </para>
         /// </summary>
         IGraphStatement SetGraphWriteConsistencyLevel(ConsistencyLevel consistency);

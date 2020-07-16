@@ -36,6 +36,12 @@ namespace Cassandra.Serialization.Graph.GraphSON2
 
         private readonly JToken _token;
 
+        internal static readonly JsonSerializerSettings GraphSONSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            DateParseHandling = DateParseHandling.None
+        };
+
         public bool IsArray => _token is JArray;
 
         public bool IsObjectTree => !IsScalar && !IsArray;
@@ -52,7 +58,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
             }
 
             _graphSONConverter = GraphSONTypeConverter.DefaultInstance;
-            var parsedJson = (JObject)JsonConvert.DeserializeObject(json);
+            var parsedJson = (JObject)JsonConvert.DeserializeObject(json, GraphSONNode.GraphSONSerializerSettings);
             _token = parsedJson["result"];
             var bulkToken = parsedJson["bulk"];
             Bulk = bulkToken != null ? GetTokenValue<long>(bulkToken) : 1L;
@@ -143,7 +149,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         {
             try
             {
-                return _graphSONConverter.To(token, type);
+                return _graphSONConverter.FromDb(token, type);
             }
             catch (InvalidOperationException ex)
             {
@@ -191,14 +197,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         /// <inheritdoc />
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (!IsObjectTree)
-            {
-                throw new NotSupportedException("Deserialization of GraphNodes that don't represent object trees is not supported");
-            }
-            foreach (var prop in ((JObject)_token).Properties())
-            {
-                info.AddValue(prop.Name, prop.Value);
-            }
+            throw new NotSupportedException("Serializing GraphNodes in GraphSON2/GraphSON3 to JSON is not supported.");
         }
 
         /// <summary>
@@ -245,7 +244,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         /// </summary>
         public GraphNode[] ToArray()
         {
-            return _graphSONConverter.To<GraphNode[]>(_token);
+            return _graphSONConverter.FromDb<GraphNode[]>(_token);
         }
 
         /// <summary>
@@ -275,11 +274,7 @@ namespace Cassandra.Serialization.Graph.GraphSON2
 
         public void WriteJson(JsonWriter writer, JsonSerializer serializer)
         {
-            if (!IsObjectTree)
-            {
-                throw new NotSupportedException("Deserialization of GraphNodes that don't represent object trees is not supported");
-            }
-            serializer.Serialize(writer, _token);
+            throw new NotSupportedException("Serializing GraphNodes in GraphSON2/GraphSON3 to JSON is not supported.");
         }
     }
 }

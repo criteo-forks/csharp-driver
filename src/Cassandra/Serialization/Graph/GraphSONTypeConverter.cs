@@ -31,21 +31,28 @@ namespace Cassandra.Serialization.Graph
     {
         private readonly TypeConverter _typeConverter;
         private readonly GraphSONReader _reader;
-        
+        private readonly GraphSONWriter _writer;
+
         public const string TypeKey = "@type";
         public const string ValueKey = "@value";
 
         public static IGraphSONTypeConverter DefaultInstance = 
-            new GraphSONTypeConverter(new DefaultTypeConverter(), new CustomGraphSON2Reader());
+            new GraphSONTypeConverter(new DefaultTypeConverter(), new CustomGraphSON2Reader(), new CustomGraphSON2Writer());
 
         public GraphSONTypeConverter(
-            TypeConverter typeConverter, GraphSONReader reader)
+            TypeConverter typeConverter, GraphSONReader reader, GraphSONWriter writer)
         {
             _typeConverter = typeConverter;
             _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+            _writer = writer ?? throw new ArgumentNullException(nameof(writer));;
         }
 
-        public T To<T>(JToken token)
+        public string ToDb(object obj)
+        {
+            return _writer.WriteObject(obj);
+        }
+
+        public T FromDb<T>(JToken token)
         {
             var type = typeof(T);
             if (TryConvert(token, type, out var result))
@@ -65,7 +72,7 @@ namespace Cassandra.Serialization.Graph
             }
         }
 
-        public object To(JToken token, Type type)
+        public object FromDb(JToken token, Type type)
         {
             if (TryConvert(token, type, out var result))
             {
@@ -179,7 +186,7 @@ namespace Cassandra.Serialization.Graph
             {
                 var value = isGraphNode
                     ? new GraphNode(new GraphSONNode(jArray[i]))
-                    : To(jArray[i], elementType);
+                    : FromDb(jArray[i], elementType);
                 arr.SetValue(value, i);
             }
             return arr;

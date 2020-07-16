@@ -49,18 +49,23 @@ namespace Cassandra.Tests.DataStax.Graph
         [Test]
         public void Implicit_Conversion_Operators_Test()
         {
-            var intNode = GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Int16\", \"@value\": 123}");
-            Assert.AreEqual(123, (int) intNode);
-            Assert.AreEqual(123L, (long) intNode);
+            var intNode = GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Int16\", \"@value\": 123}");
+            Assert.Throws<InvalidTypeException>(
+                () => { var _ = (int) intNode; }, 
+                "Cassandra.InvalidTypeException : It is not possible to convert type System.Int16 to target type System.Int32");
+            Assert.Throws<InvalidTypeException>(
+                () => { var _ = (long) intNode; }, 
+                "Cassandra.InvalidTypeException : It is not possible to convert type System.Int16 to target type System.Int64");
             Assert.AreEqual((short)123, (short) intNode);
-            Assert.AreEqual(123, (int) intNode);
             string stringValue = GraphNodeGraphSON2Tests.GetGraphNode("\"something\"");
             Assert.AreEqual("something", stringValue);
             bool boolValue = GraphNodeGraphSON2Tests.GetGraphNode("true");
             Assert.True(boolValue);
             var floatNode = GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Float\", \"@value\": 123.1}");
             Assert.AreEqual(123.1f, (float) floatNode);
-            Assert.AreEqual(123.1D, (double) floatNode);
+            Assert.Throws<InvalidTypeException>(
+                () => { var _ = (double) floatNode; }, 
+                "Cassandra.InvalidTypeException : It is not possible to convert type System.Single to target type System.Double");
         }
 
         [Test]
@@ -77,6 +82,21 @@ namespace Cassandra.Tests.DataStax.Graph
             Assert.Throws<InvalidOperationException>(() => node.To<TimeUuid>());
             Assert.Throws<InvalidOperationException>(() => node.To<BigInteger>());
             Assert.Throws<InvalidOperationException>(() => node.To<Duration>());
+        }
+        [Test]
+        public void To_Should_Not_Throw_For_Nullables_With_Null()
+        {
+            var node = GraphNodeGraphSON2Tests.GetGraphNode("null");
+            Assert.IsNull(node.To<short?>());
+            Assert.IsNull(node.To<int?>());
+            Assert.IsNull(node.To<long?>());
+            Assert.IsNull(node.To<decimal?>());
+            Assert.IsNull(node.To<float?>());
+            Assert.IsNull(node.To<double?>());
+            Assert.IsNull(node.To<Guid?>());
+            Assert.IsNull(node.To<TimeUuid?>());
+            Assert.IsNull(node.To<BigInteger?>());
+            Assert.IsNull(node.To<Duration?>());
         }
 
         [Test]
@@ -251,12 +271,23 @@ namespace Cassandra.Tests.DataStax.Graph
             CollectionAssert.AreEqual(Encoding.UTF8.GetBytes(stringValue), node.To<byte[]>());
         }
 
-        [TestCase("{\"@type\": \"gx:Instant\", \"@value\": 1000}", 
+        [TestCase("{\"@type\": \"g:Timestamp\", \"@value\": 1000}", 
             "1970-01-01 00:00:01Z")]
+        [TestCase("{\"@type\": \"gx:Instant\", \"@value\": \"2016-12-14T16:39:19.349Z\"}", 
+            "2016-12-14T16:39:19.349Z")]
+        [TestCase("null", null)]
         public void To_Should_Parse_DateTimeOffset_Values(string json, string stringValue)
         {
             var node = GraphNodeGraphSON2Tests.GetGraphNode(json);
-            Assert.AreEqual(DateTimeOffset.Parse(stringValue), node.To<DateTimeOffset>());
+            if (stringValue == null)
+            {
+                Assert.AreEqual(null, node.To<DateTimeOffset?>());
+            }
+            else
+            {
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<DateTimeOffset>());
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<DateTimeOffset?>());
+            }
         }
 
         [TestCase("{\"@type\": \"gx:LocalDate\", \"@value\": \"1981-09-14\"}", "1981-09-14")]
@@ -310,9 +341,8 @@ namespace Cassandra.Tests.DataStax.Graph
         }
         
         [Test]
-        public void GraphNode_Should_Be_Serializable_Json()
+        public void GraphNode_Ctor_Should_ThrowNotSupported_When_TypedGraphSON()
         {
-            var settings = new JsonSerializerSettings();
             const string json = "{\"@type\":\"g:Vertex\",\"@value\":{" +
                                 "\"id\":{\"@type\":\"g:Int32\",\"@value\":1368843392}," +
                                 "\"label\":\"user\"," +
@@ -320,25 +350,7 @@ namespace Cassandra.Tests.DataStax.Graph
                                 "\"name\":[{\"@type\":\"g:VertexProperty\",\"@value\":{\"id\":{\"@type\":\"g:Int64\",\"@value\":0},\"value\":\"jorge\"}}]," +
                                 "\"age\":[{\"@type\":\"g:VertexProperty\",\"@value\":{\"id\":{\"@type\":\"g:Int64\",\"@value\":1},\"value\":{\"@type\":\"g:Int32\",\"@value\":35}}}]}" +
                                 "}}";
-            IGraphNode node = new GraphNode("{\"result\":" + json + "}");
-            var serialized = JsonConvert.SerializeObject(node, settings);
-            Assert.AreEqual(json, serialized);
-        }
-
-        [Test]
-        public void GraphNode_Should_ThrowNotSupported_When_JsonSerializeWithGraphSON2Converter()
-        {
-            var settings = new JsonSerializerSettings();
-            settings = GraphSON2ContractResolver.Settings;
-            const string json = "{\"@type\":\"g:Vertex\",\"@value\":{" +
-                                "\"id\":{\"@type\":\"g:Int32\",\"@value\":1368843392}," +
-                                "\"label\":\"user\"," +
-                                "\"properties\":{" +
-                                "\"name\":[{\"@type\":\"g:VertexProperty\",\"@value\":{\"id\":{\"@type\":\"g:Int64\",\"@value\":0},\"value\":\"jorge\"}}]," +
-                                "\"age\":[{\"@type\":\"g:VertexProperty\",\"@value\":{\"id\":{\"@type\":\"g:Int64\",\"@value\":1},\"value\":{\"@type\":\"g:Int32\",\"@value\":35}}}]}" +
-                                "}}";
-            IGraphNode node = new GraphNode("{\"result\":" + json + "}");
-            Assert.Throws<NotSupportedException>(() => JsonConvert.SerializeObject(node, settings));
+            Assert.Throws<NotSupportedException>(() => new GraphNode("{\"result\":" + json + "}"));
         }
 
         /// <summary>

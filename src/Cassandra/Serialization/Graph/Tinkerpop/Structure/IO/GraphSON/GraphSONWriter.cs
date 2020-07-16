@@ -41,10 +41,6 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
         protected readonly Dictionary<Type, IGraphSONSerializer> Serializers = new Dictionary
             <Type, IGraphSONSerializer>
             {
-                //{typeof(ITraversal), new TraversalSerializer()},
-                //{typeof(Bytecode), new BytecodeSerializer()},
-                //{typeof(Binding), new BindingSerializer()},
-                //{typeof(RequestMessage), new RequestMessageSerializer()},
                 {typeof(int), new Int32Converter()},
                 {typeof(long), new Int64Converter()},
                 {typeof(float), new FloatConverter()},
@@ -52,15 +48,6 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
                 {typeof(Guid), new UuidSerializer()},
                 {typeof(DateTimeOffset), new DateSerializer()},
                 {typeof(Type), new ClassSerializer()},
-                //{typeof(EnumWrapper), new EnumSerializer()},
-                //{typeof(P), new PSerializer()},
-                //{typeof(TextP), new TextPSerializer()},
-                //{typeof(Vertex), new VertexSerializer()},
-                //{typeof(Edge), new EdgeSerializer()},
-                //{typeof(Property), new PropertySerializer()},
-                //{typeof(VertexProperty), new VertexPropertySerializer()},
-                //{typeof(AbstractTraversalStrategy), new TraversalStrategySerializer()},
-                //{typeof(ILambda), new LambdaSerializer()},
 
                 //Extended
                 {typeof(decimal), new DecimalConverter()},

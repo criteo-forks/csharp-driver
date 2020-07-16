@@ -19,21 +19,21 @@ namespace Cassandra
     /// <summary>
     /// Specifies the different graph protocol versions that are supported by the driver
     /// </summary>
-    public enum GraphProtocolVersion
+    public enum GraphProtocol
     {
         /// <summary>
         /// GraphSON v1.
         /// </summary>
-        GraphSON1,
+        GraphSON1 = 1,
 
         /// <summary>
         /// GraphSON v12.
         /// </summary>
-        GraphSON2,
+        GraphSON2 = 2,
 
         /// <summary>
         /// GraphSON v3.
         /// </summary>
-        GraphSON3
+        GraphSON3 = 3
     }
 }

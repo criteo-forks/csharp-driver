@@ -37,13 +37,18 @@ namespace Cassandra.Serialization.Graph.Dse
 
         public dynamic Objectify(JToken graphsonObject, GraphSONReader reader)
         {
-            var str = graphsonObject.ToObject<string>();
+            var str = TokenToString(graphsonObject);
             if (str == null)
             {
                 return null;
             }
 
             return FromString(str);
+        }
+
+        protected virtual string TokenToString(JToken token)
+        {
+            return token.ToObject<string>();
         }
         
         protected abstract string ToString(dynamic obj);

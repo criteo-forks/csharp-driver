@@ -40,7 +40,8 @@ namespace Cassandra.Serialization.Graph.Dse
                 graphNode.Get<GraphNode>("id", true), 
                 graphNode.Get<string>("label"),
                 graphNode.Get<GraphNode>("value", true),
-                graphNode.Get<GraphNode>("properties")?.GetProperties() ?? BaseDeserializer.EmptyProperties);
+                graphNode.Get<GraphNode>("vertex"),
+                BaseDeserializer.EmptyProperties);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Cassandra.DataStax.Graph
         public GraphNode(string json)
         {
             // A local default
-            _node = new GraphSON1Node(json);
+            _node = new GraphSON1Node(json, true);
         }
 
         internal GraphNode(INode node)
@@ -97,11 +97,11 @@ namespace Cassandra.DataStax.Graph
             if (objectTree["@type"] != null)
             {
                 throw new NotSupportedException(
-                    "Directly deserializing a graph node from JSON is not supported with GraphSON2 or GraphSON3.");
+                    "Deserializing a graph node from JSON is not supported with GraphSON2 or GraphSON3.");
             }
             else
             {
-                _node = new GraphSON1Node(objectTree);
+                _node = GraphSON1Node.CreateParsedNode(objectTree);
             }
         }
 
@@ -110,11 +110,11 @@ namespace Cassandra.DataStax.Graph
             if (objectTree["@type"] != null)
             {
                 throw new NotSupportedException(
-                    "Directly deserializing a graph node from JSON is not supported with GraphSON2 or GraphSON3.");
+                    "Deserializing a graph node from JSON is not supported with GraphSON2 or GraphSON3.");
             }
             else
             {
-                _node = new GraphSON1Node(objectTree);
+                _node = GraphSON1Node.CreateParsedNode(objectTree);
             }
         }
 
