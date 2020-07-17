@@ -31,7 +31,8 @@ namespace Cassandra.Serialization.Graph.GraphSON2
             new Dictionary<Type, IGraphSONSerializer>
             {
                 { typeof(DateTime), new DateSerializer() },
-                { typeof(Instant), new InstantSerializer() },
+                { typeof(JavaInstant), new InstantSerializer() },
+                { typeof(JavaDuration), new JavaDurationSerializer() },
                 { typeof(LocalTime), new LocalTimeSerializer() },
                 { typeof(LocalDate), new LocalDateSerializer() },
                 { typeof(IPAddress), new InetAddressSerializer() },

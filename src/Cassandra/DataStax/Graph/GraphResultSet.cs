@@ -37,6 +37,11 @@ namespace Cassandra.DataStax.Graph
         public ExecutionInfo Info => _rs.Info;
 
         /// <summary>
+        /// Gets the graph protocol version that will be considered when deserializing this result set.
+        /// </summary>
+        public GraphProtocol GraphProtocol { get; }
+
+        /// <summary>
         /// Creates a new instance of <see cref="GraphResultSet"/>.
         /// </summary>
         public GraphResultSet(RowSet rs) : this(rs, GraphProtocol.GraphSON1)
@@ -47,6 +52,7 @@ namespace Cassandra.DataStax.Graph
         private GraphResultSet(RowSet rs, GraphProtocol version)
         {
             _rs = rs ?? throw new ArgumentNullException(nameof(rs));
+            GraphProtocol = version;
 
             if (version == GraphProtocol.GraphSON1)
             {

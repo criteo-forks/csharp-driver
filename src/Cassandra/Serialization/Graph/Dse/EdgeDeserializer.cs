@@ -36,7 +36,7 @@ namespace Cassandra.Serialization.Graph.Dse
         public dynamic Objectify(JToken token, GraphSONReader reader)
         {
             var properties = BaseDeserializer.EmptyProperties;
-            var tokenProperties = token["properties"];
+            var tokenProperties = !(token is JObject jobj) ? null : jobj["properties"];
             if (tokenProperties != null && tokenProperties is JObject propertiesJsonProp)
             {
                 properties = propertiesJsonProp

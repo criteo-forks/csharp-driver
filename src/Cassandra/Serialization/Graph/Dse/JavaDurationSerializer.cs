@@ -13,35 +13,31 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Globalization;
 using Cassandra.DataStax.Graph;
 using Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON;
 
 namespace Cassandra.Serialization.Graph.Dse
 {
-    internal class InstantSerializer : StringBasedSerializer
+    internal class JavaDurationSerializer : StringBasedSerializer
     {
         private const string Prefix = "gx";
-        private const string TypeKey = "Instant";
+        private const string TypeKey = "Duration";
 
-        private const string FormatString = "yyyy-MM-ddTHH:mm:ss.fffZ";
-
-        public InstantSerializer() : base(InstantSerializer.Prefix, InstantSerializer.TypeKey)
+        public JavaDurationSerializer() : base(JavaDurationSerializer.Prefix, JavaDurationSerializer.TypeKey)
         {
         }
 
-        public static string TypeName => GraphSONUtil.FormatTypeName(InstantSerializer.Prefix, InstantSerializer.TypeKey);
+        public static string TypeName => GraphSONUtil.FormatTypeName(JavaDurationSerializer.Prefix, JavaDurationSerializer.TypeKey);
 
         protected override string ToString(dynamic obj)
         {
-            JavaInstant javaInstant = obj;
-            return javaInstant.Value.ToString(InstantSerializer.FormatString, CultureInfo.InvariantCulture);
+            JavaDuration javaInstant = obj;
+            return javaInstant.Value.ToJavaDurationString();
         }
 
         protected override dynamic FromString(string str)
         {
-            return new JavaInstant(DateTimeOffset.Parse(str, CultureInfo.InvariantCulture));
+            return new JavaDuration(Duration.Parse(str));
         }
     }
 }

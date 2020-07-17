@@ -142,34 +142,12 @@ namespace Cassandra.Serialization.Graph.GraphSON2
         /// </summary>
         private T GetTokenValue<T>(JToken token)
         {
-            try
-            {
-                return _graphSONConverter.FromDb<T>(token);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new NotSupportedException($"Type {typeof(T)} is not supported", ex);
-            }
-            catch (JsonReaderException ex)
-            {
-                throw new InvalidOperationException($"Could not convert to {typeof(T)}: {token}", ex);
-            }
+            return _graphSONConverter.FromDb<T>(token);
         }
 
         private object GetTokenValue(JToken token, Type type)
         {
-            try
-            {
-                return _graphSONConverter.FromDb(token, type);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new NotSupportedException($"Type {type} is not supported", ex);
-            }
-            catch (JsonReaderException ex)
-            {
-                throw new InvalidOperationException($"Could not convert to {type}: {token}", ex);
-            }
+            return _graphSONConverter.FromDb(token, type);
         }
 
         /// <summary>

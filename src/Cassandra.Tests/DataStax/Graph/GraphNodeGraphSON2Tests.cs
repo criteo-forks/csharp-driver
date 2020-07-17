@@ -123,7 +123,7 @@ namespace Cassandra.Tests.DataStax.Graph
             Assert.AreEqual(BigInteger.Parse("1"), 
                             GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Int16\", \"@value\": 1}").To<BigInteger?>());
             Assert.AreEqual(Duration.Parse("12h"), 
-                            GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Duration\", \"@value\": \"12h\"}").To<Duration?>());
+                            GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"gx:Duration\", \"@value\": \"12h\"}").To<Duration?>());
             Assert.AreEqual(DateTimeOffset.Parse("1970-01-01 00:00:01Z"), 
                 GraphNodeGraphSON2Tests.GetGraphNode("{\"@type\": \"g:Timestamp\", \"@value\": 1000}").To<DateTimeOffset?>());
         }
@@ -291,13 +291,13 @@ namespace Cassandra.Tests.DataStax.Graph
             var node = GraphNodeGraphSON2Tests.GetGraphNode(json);
             if (stringValue == null)
             {
-                Assert.AreEqual(null, node.To<Instant?>());
+                Assert.AreEqual(null, node.To<JavaInstant?>());
             }
             else
             {
-                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<Instant>());
-                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<Instant?>());
-                Assert.AreEqual(new Instant(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture)), node.To<Instant>());
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<JavaInstant>());
+                Assert.AreEqual(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture), node.To<JavaInstant?>());
+                Assert.AreEqual(new JavaInstant(DateTimeOffset.Parse(stringValue, CultureInfo.InvariantCulture)), node.To<JavaInstant>());
             }
         }
 

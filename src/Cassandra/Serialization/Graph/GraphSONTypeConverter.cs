@@ -68,8 +68,11 @@ namespace Cassandra.Serialization.Graph
             }
             catch (Exception ex)
             {
-                var message = $"It is not possible to convert type {result.GetType().FullName} to target type {type.FullName}";
-                throw new InvalidTypeException(message, ex);
+                var message = result == null 
+                    ? $"It is not possible to convert NULL to target type {type.FullName}" 
+                    : $"It is not possible to convert type {result.GetType().FullName} to target type {type.FullName}";
+
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -90,8 +93,10 @@ namespace Cassandra.Serialization.Graph
             }
             catch (Exception ex)
             {
-                var message = $"It is not possible to convert type {result.GetType().FullName} to target type {type.FullName}";
-                throw new InvalidTypeException(message, ex);
+                var message = result == null 
+                    ? $"It is not possible to convert NULL to target type {type.FullName}" 
+                    : $"It is not possible to convert type {result.GetType().FullName} to target type {type.FullName}";
+                throw new InvalidOperationException(message, ex);
             }
         }
 
@@ -151,7 +156,9 @@ namespace Cassandra.Serialization.Graph
             if (obj == null)
             {
                 result = null;
-                return true;
+
+                // return true if type supports null
+                return !targetType.IsValueType || (Nullable.GetUnderlyingType(targetType) != null);
             }
 
             var objType = obj.GetType();

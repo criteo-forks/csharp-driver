@@ -35,7 +35,7 @@ namespace Cassandra.Serialization.Graph.Dse
 
         protected GraphNode ToGraphNode(JToken token, string propName, bool required = false)
         {
-            var prop = token[propName];
+            var prop = !(token is JObject jobj) ? null : jobj[propName];
             if (prop == null)
             {
                 if (!required)
@@ -55,7 +55,7 @@ namespace Cassandra.Serialization.Graph.Dse
 
         protected string ToString(JToken token, string propName, bool required = false)
         {
-            var prop = token[propName];
+            var prop = !(token is JObject jobj) ? null : jobj[propName];
             if (prop == null)
             {
                 if (!required)

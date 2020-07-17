@@ -27,28 +27,31 @@ namespace Cassandra.Serialization.Graph.GraphSON2
     {
         private static readonly Func<JToken, GraphNode> GraphNodeFactory;
 
-        private static readonly IDictionary<string, IGraphSONDeserializer> CustomGraphSON2SpecificDeserializers =
-            new Dictionary<string, IGraphSONDeserializer>
-            {
-                { InstantSerializer.TypeName, new InstantSerializer() },
-                { LocalTimeSerializer.TypeName, new LocalTimeSerializer() },
-                { LocalDateSerializer.TypeName, new LocalDateSerializer() },
-                { InetAddressSerializer.TypeName, new InetAddressSerializer() },
-                { BlobSerializer.TypeName, new BlobSerializer() },
-                { LineStringSerializer.TypeName, new LineStringSerializer() },
-                { PointSerializer.TypeName, new PointSerializer() },
-                { PolygonSerializer.TypeName, new PolygonSerializer() },
-                { VertexDeserializer.TypeName, new VertexDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-                { VertexPropertyDeserializer.TypeName, new VertexPropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-                { EdgeDeserializer.TypeName, new EdgeDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-                { PathDeserializer.TypeName, new PathDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-                { PropertyDeserializer.TypeName, new PropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-                { TraverserDeserializer.TypeName, new TraverserDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
-            };
+        private static readonly IDictionary<string, IGraphSONDeserializer> CustomGraphSON2SpecificDeserializers;
 
         static CustomGraphSON2Reader()
         {
             CustomGraphSON2Reader.GraphNodeFactory = token => new GraphNode(new GraphSONNode(token));
+
+            CustomGraphSON2Reader.CustomGraphSON2SpecificDeserializers =
+                new Dictionary<string, IGraphSONDeserializer>
+                {
+                    { JavaDurationSerializer.TypeName, new JavaDurationSerializer() },
+                    { InstantSerializer.TypeName, new InstantSerializer() },
+                    { LocalTimeSerializer.TypeName, new LocalTimeSerializer() },
+                    { LocalDateSerializer.TypeName, new LocalDateSerializer() },
+                    { InetAddressSerializer.TypeName, new InetAddressSerializer() },
+                    { BlobSerializer.TypeName, new BlobSerializer() },
+                    { LineStringSerializer.TypeName, new LineStringSerializer() },
+                    { PointSerializer.TypeName, new PointSerializer() },
+                    { PolygonSerializer.TypeName, new PolygonSerializer() },
+                    { VertexDeserializer.TypeName, new VertexDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                    { VertexPropertyDeserializer.TypeName, new VertexPropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                    { EdgeDeserializer.TypeName, new EdgeDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                    { PathDeserializer.TypeName, new PathDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                    { PropertyDeserializer.TypeName, new PropertyDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                    { TraverserDeserializer.TypeName, new TraverserDeserializer(CustomGraphSON2Reader.GraphNodeFactory) },
+                };
         }
         
         /// <summary>
