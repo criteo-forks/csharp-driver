@@ -30,7 +30,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     ///     Provides helper methods for GraphSON serialization.
     /// </summary>
-    public static class GraphSONUtil
+    internal static class GraphSONUtil
     {
         /// <summary>
         ///     Transforms a value intos its GraphSON representation including type information.

@@ -28,7 +28,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     ///     Supports serializing of an object to GraphSON.
     /// </summary>
-    public interface IGraphSONSerializer
+    internal interface IGraphSONSerializer
     {
         /// <summary>
         ///     Transforms an object into a dictionary that resembles its GraphSON representation.

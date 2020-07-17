@@ -28,7 +28,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     /// Handles deserialization of GraphSON3 data.
     /// </summary>
-    public class GraphSON3Reader : GraphSONReader
+    internal class GraphSON3Reader : GraphSONReader
     {
         private static readonly IDictionary<string, IGraphSONDeserializer> GraphSON3SpecificDeserializers =
             new Dictionary<string, IGraphSONDeserializer>

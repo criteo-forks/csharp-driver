@@ -28,7 +28,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     /// Handles deserialization of GraphSON3 data.
     /// </summary>
-    public class GraphSON2Reader : GraphSONReader
+    internal class GraphSON2Reader : GraphSONReader
     {
         /// <summary>
         /// Creates a new instance of <see cref="GraphSON2Reader"/>.

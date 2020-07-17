@@ -32,7 +32,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     ///     Allows to deserialize GraphSON to objects.
     /// </summary>
-    public abstract class GraphSONReader
+    internal abstract class GraphSONReader
     {
         /// <summary>
         /// Contains the <see cref="IGraphSONDeserializer" /> instances by their type identifier.

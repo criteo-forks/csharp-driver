@@ -29,7 +29,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     /// Handles serialization of GraphSON3 data.
     /// </summary>
-    public class GraphSON3Writer : GraphSONWriter
+    internal class GraphSON3Writer : GraphSONWriter
     {
         private static readonly IDictionary<Type, IGraphSONSerializer> GraphSON3SpecificSerializers =
             new Dictionary<Type, IGraphSONSerializer>

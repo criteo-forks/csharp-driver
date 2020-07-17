@@ -15,6 +15,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -337,6 +338,100 @@ namespace Cassandra.Tests.DataStax.Graph
             Assert.AreEqual("jorge", iVertex.GetProperty("name").Value.ToString());
             Assert.AreEqual(35, iVertex.GetProperty("age").Value.To<int>());
             Assert.Null(iVertex.GetProperty("nonExistent"));
+        }
+
+        [Test]
+        public void To_Should_Parse_Edge_Values()
+        {
+            var node = GraphNodeGraphSON2Tests.GetGraphNode(
+                @"{
+  ""@type"" : ""g:Edge"",
+  ""@value"" : {
+    ""id"" : { ""@type"" : ""g:Int32"", ""@value"" : 13 },
+    ""label"" : ""develops"",
+    ""inVLabel"" : ""software"",
+    ""outVLabel"" : ""person"",
+    ""inV"" : { ""@type"" : ""g:Int32"",""@value"" : 10 },
+    ""outV"" : {""@type"" : ""g:Int32"",""@value"" : 1 },
+    ""properties"" : { ""since"" : { ""@type"" : ""g:Int32"", ""@value"" : 2009 } }
+  }
+}");
+            var edge = node.To<Edge>();
+            Assert.AreEqual("develops", edge.Label);
+            Assert.AreEqual("software", edge.InVLabel);
+            Assert.AreEqual("person", edge.OutVLabel);
+            Assert.AreEqual(10, edge.InV.To<int>());
+            Assert.AreEqual(1, edge.OutV.To<int>());
+            Assert.AreEqual(2009, edge.Properties["since"].To<int>());
+            Assert.AreEqual(2009, edge.GetProperty("since").Value.To<int>());
+            Assert.Null(edge.GetProperty("nonExistent"));
+        }
+
+        [Test]
+        public void To_Should_Parse_Path_Values()
+        {
+            var node = GraphNodeGraphSON2Tests.GetGraphNode(
+                @"{
+  ""@type"" : ""g:Path"",
+  ""@value"" : {
+    ""labels"" : [ [ ], [ ], [ ] ],
+    ""objects"" : [ {
+      ""@type"" : ""g:Vertex"",
+      ""@value"" : {
+        ""id"" : { ""@type"" : ""g:Int32"", ""@value"" : 1 },
+        ""label"" : ""person""
+      }
+    }, {
+      ""@type"" : ""g:Vertex"",
+      ""@value"" : {
+        ""id"" : { ""@type"" : ""g:Int32"", ""@value"" : 10 },
+        ""label"" : ""software"",
+        ""properties"" : { ""name"" : [ { ""@type"" : ""g:VertexProperty"", ""@value"" : { ""id"" : { ""@type"" : ""g:Int64"", ""@value"" : 4 }, ""value"" : ""gremlin"", ""vertex"" : { ""@type"" : ""g:Int32"", ""@value"" : 10 }, ""label"" : ""name"" } } ]
+     }
+      }
+    }, {
+      ""@type"" : ""g:Vertex"",
+      ""@value"" : {
+        ""id"" : { ""@type"" : ""g:Int32"", ""@value"" : 11 },
+        ""label"" : ""software"",
+        ""properties"" : {
+          ""name"" : [ 
+		      { ""@type"" : ""g:VertexProperty"", ""@value"" : { ""id"" : { ""@type"" : ""g:Int64"", ""@value"" : 5 }, ""value"" : ""tinkergraph"", ""vertex"" : { ""@type"" : ""g:Int32"", ""@value"" : 11 }, ""label"" : ""name"" } } ]
+        }
+      }
+    } ]
+  }
+}");
+            var path = node.To<Path>();
+            Assert.AreEqual(3, path.Labels.Count);
+            Assert.IsTrue(path.Labels.All(c => c.Count == 0));
+
+            var firstVertex = path.Objects.ElementAt(0).To<Vertex>();
+            Assert.AreEqual(1, firstVertex.Id.To<int>());
+            Assert.AreEqual("person", firstVertex.Label);
+            Assert.AreEqual(0, firstVertex.Properties.Count);
+            
+            var secondVertex = path.Objects.ElementAt(1).To<Vertex>();
+            Assert.AreEqual(10, secondVertex.Id.To<int>());
+            Assert.AreEqual("software", secondVertex.Label);
+            Assert.AreEqual(1, secondVertex.Properties.Count);
+            Assert.AreEqual(1, secondVertex.Properties.Single().Value.To<IEnumerable<VertexProperty>>().Count());
+            var secondVertexProperty = secondVertex.GetProperty("name");
+            Assert.AreEqual(4L, secondVertexProperty.Id.To<long>());
+            Assert.AreEqual("gremlin", secondVertexProperty.Value.To<string>());
+            Assert.AreEqual("name", secondVertexProperty.Label);
+            Assert.AreEqual(10, secondVertexProperty.Vertex.To<int>());
+            
+            var thirdVertex = path.Objects.ElementAt(2).To<Vertex>();
+            Assert.AreEqual(11, thirdVertex.Id.To<int>());
+            Assert.AreEqual("software", thirdVertex.Label);
+            Assert.AreEqual(1, thirdVertex.Properties.Count);
+            Assert.AreEqual(1, thirdVertex.Properties.Single().Value.To<IEnumerable<VertexProperty>>().Count());
+            var thirdVertexProperty = thirdVertex.GetProperty("name");
+            Assert.AreEqual(5L, thirdVertexProperty.Id.To<long>());
+            Assert.AreEqual("tinkergraph", thirdVertexProperty.Value.To<string>());
+            Assert.AreEqual("name", thirdVertexProperty.Label);
+            Assert.AreEqual(11, thirdVertexProperty.Vertex.To<int>());
         }
 
         [Test]

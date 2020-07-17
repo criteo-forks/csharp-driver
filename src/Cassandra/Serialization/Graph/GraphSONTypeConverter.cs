@@ -136,16 +136,17 @@ namespace Cassandra.Serialization.Graph
                 {
                     elementType = type.GetTypeInfo().GetGenericArguments()[0];
                 }
-
-                if (elementType == typeof(object) || elementType == typeof(GraphNode) || elementType == typeof(IGraphNode))
+                else
                 {
-                    if (!(token is JArray))
-                    {
-                        return ConvertFromDb(ToArray((JArray)token[GraphSONTokens.ValueKey], elementType), type, out result);
-                    }
-
-                    return ConvertFromDb(ToArray((JArray)token, elementType), type, out result);
+                    throw new InvalidOperationException($"Can not deserialize a collection to type {type.FullName}");
                 }
+                
+                if (!(token is JArray))
+                {
+                    return ConvertFromDb(ToArray((JArray)token[GraphSONTokens.ValueKey], elementType), type, out result);
+                }
+
+                return ConvertFromDb(ToArray((JArray)token, elementType), type, out result);
             }
 
             return ConvertFromDb(_reader.ToObject(token), type, out result);

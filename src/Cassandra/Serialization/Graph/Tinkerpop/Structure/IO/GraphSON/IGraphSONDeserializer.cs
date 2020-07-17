@@ -28,7 +28,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     ///     Supports deserializing GraphSON into an object.
     /// </summary>
-    public interface IGraphSONDeserializer
+    internal interface IGraphSONDeserializer
     {
         /// <summary>
         ///     Deserializes GraphSON to an object.

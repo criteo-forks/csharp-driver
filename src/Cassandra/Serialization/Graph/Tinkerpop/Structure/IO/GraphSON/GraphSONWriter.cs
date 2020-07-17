@@ -33,7 +33,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     ///     Allows to serialize objects to GraphSON.
     /// </summary>
-    public abstract class GraphSONWriter
+    internal abstract class GraphSONWriter
     {
         /// <summary>
         /// Contains the information of serializers by type.

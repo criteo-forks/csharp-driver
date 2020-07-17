@@ -29,7 +29,7 @@ namespace Cassandra.Serialization.Graph.Tinkerpop.Structure.IO.GraphSON
     /// <summary>
     /// Handles serialization of GraphSON2 data.
     /// </summary>
-    public class GraphSON2Writer : GraphSONWriter
+    internal class GraphSON2Writer : GraphSONWriter
     {
         /// <summary>
         /// Creates a new instance of <see cref="GraphSON2Writer"/>.
