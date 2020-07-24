@@ -837,6 +837,7 @@ namespace Cassandra.IntegrationTests.DataStax.Graph
 
                 var set = new HashSet<DateTimeOffset>
                 {
+                    new DateTimeOffset(12414124L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(2)),
                     TimeZoneInfo.ConvertTimeFromUtc(12414124L.ToDateFromMillisecondsSinceEpoch().UtcDateTime, cstZone), 
                     2141247L.ToDateFromMillisecondsSinceEpoch(),
                     834742874L.ToDateFromMillisecondsSinceEpoch()
