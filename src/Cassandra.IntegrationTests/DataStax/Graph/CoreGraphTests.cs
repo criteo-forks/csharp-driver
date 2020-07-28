@@ -609,7 +609,7 @@ namespace Cassandra.IntegrationTests.DataStax.Graph
                     new TestCaseData("Bigint", long.MaxValue, "9223372036854775807", null, null),
                     new TestCaseData("Bigint", long.MinValue, "-9223372036854775808", null, null),
                     new TestCaseData("Bigint", 0L, "0", null, null),
-                    new TestCaseData("Float", 3.1415927f, "3.1415927", floatToString, null),
+                    new TestCaseData("Float", 3.141592f, "3.141592", floatToString, null),
                     new TestCaseData("Double", 3.1415d, "3.1415", doubleToString, null),
                     new TestCaseData("Duration", Duration.Parse("P2DT3H4M"), "P2DT3H4M", durationToString, Duration.Parse("P2DT3H4M")),
                     new TestCaseData("Duration", Duration.Parse("PT5S"), "PT5S", durationToString, Duration.Parse("PT5S")),
@@ -832,13 +832,12 @@ namespace Cassandra.IntegrationTests.DataStax.Graph
                     new Point(7.5, 6.5),
                     new Point(4, 5)
                 };
-
-                TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+                
 
                 var set = new HashSet<DateTimeOffset>
                 {
                     new DateTimeOffset(12414124L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(2)),
-                    TimeZoneInfo.ConvertTimeFromUtc(12414124L.ToDateFromMillisecondsSinceEpoch().UtcDateTime, cstZone), 
+                    new DateTimeOffset(55446464L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(-5)), 
                     2141247L.ToDateFromMillisecondsSinceEpoch(),
                     834742874L.ToDateFromMillisecondsSinceEpoch()
                 };
@@ -852,8 +851,11 @@ namespace Cassandra.IntegrationTests.DataStax.Graph
                 
                 var dateTimeSet = new HashSet<DateTime>
                 {
-                    TimeZoneInfo.ConvertTimeFromUtc(12414124L.ToDateFromMillisecondsSinceEpoch().UtcDateTime, cstZone),
-                    TimeZoneInfo.ConvertTimeFromUtc(12414124L.ToDateFromMillisecondsSinceEpoch().UtcDateTime, cstZone),
+                    new DateTime(2013, 2, 2, 2, 2, 2, DateTimeKind.Unspecified),
+                    new DateTime(2015, 2, 2, 2, 2, 2, DateTimeKind.Local),
+                    new DateTimeOffset(1232445L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(2)).DateTime,
+                    new DateTimeOffset(13232124L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(-3)).DateTime,
+                    new DateTimeOffset(124124124L.ToDateFromMillisecondsSinceEpoch().DateTime, TimeSpan.FromHours(-10)).UtcDateTime,
                     new DateTime(2014, 1, 1, 1, 1, 2, DateTimeKind.Utc)
                 };
 
