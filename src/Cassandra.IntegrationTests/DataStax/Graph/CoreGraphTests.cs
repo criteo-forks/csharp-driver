@@ -791,6 +791,36 @@ namespace Cassandra.IntegrationTests.DataStax.Graph
         }
 
         [Test]
+        public void Should_Support_BulkSet()
+        {
+            var expectedList = new[] { 29, 27, 32, 35 };
+            var expectedMap = new Dictionary<int, int> { { 29, 1 }, { 27, 1 }, { 32, 1 }, { 35, 1 } };
+            using (var cluster = ClusterBuilder()
+                                 .AddContactPoint(TestClusterManager.InitialContactPoint)
+                                 .WithGraphOptions(new GraphOptions().SetName(CoreGraphTests.GraphName))
+                                 .Build())
+            {
+                var session = cluster.Connect();
+                var rs = session.ExecuteGraph(new SimpleGraphStatement(
+                    "g.V().hasLabel('person').aggregate('x').by('age').cap('x')"));
+                var resultArray = rs.ToArray();
+                Assert.AreEqual(1, resultArray.Length);
+                var node = resultArray[0];
+
+                CollectionAssert.AreEquivalent(expectedList, node.To<IEnumerable<int>>());
+                CollectionAssert.AreEquivalent(expectedList, node.To<IList<int>>());
+                CollectionAssert.AreEquivalent(expectedList, node.To<ICollection<int>>());
+                CollectionAssert.AreEquivalent(expectedList, node.To<List<int>>());
+                CollectionAssert.AreEquivalent(expectedList, node.To<IReadOnlyCollection<int>>());
+                CollectionAssert.AreEquivalent(expectedList, node.To<IReadOnlyList<int>>());
+                
+                CollectionAssert.AreEquivalent(expectedMap, node.To<IDictionary<int, int>>());
+                CollectionAssert.AreEquivalent(expectedMap, node.To<IReadOnlyDictionary<int, int>>());
+                CollectionAssert.AreEquivalent(expectedMap, node.To<Dictionary<int, int>>());
+            }
+        }
+
+        [Test]
         public void Should_Support_Collections()
         {
             using (var cluster = ClusterBuilder()
