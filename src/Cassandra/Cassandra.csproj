@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="[4.6.0,5.0)" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <PackageReference Include="lz4net" Version="1.0.15.94-criteo" />
